@@ -32,6 +32,11 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
+#define UART_TEST_INTERVAL_MS 100U
+#define SPI_TEST_INTERVAL_MS   50U
+#define I2C_TEST_INTERVAL_MS  200U
+#define I2C_TARGET_ADDR       (0x45U << 1)
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -47,6 +52,23 @@ SPI_HandleTypeDef hspi2;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+
+uint32_t uart_last_tick = 0U;
+uint32_t spi_last_tick = 0U;
+uint32_t i2c_last_tick = 0U;
+
+volatile uint8_t uart_rx_done = 0U;
+volatile uint8_t spi_rx_done = 0U;
+volatile uint8_t i2c_rx_done = 0U;
+
+const uint8_t uart_tx_data[] = "CAPYDY_UART_TEST\r\n";
+uint8_t uart_rx_data[sizeof(uart_tx_data)] = {0};
+
+const uint8_t spi_tx_data[] = "CAPYDY_SPI_TEST";
+uint8_t spi_rx_data[sizeof(spi_tx_data)] = {0};
+
+const uint8_t i2c_tx_data[] = "CAPYDY_I2C_TEST";
+uint8_t i2c_rx_data[8] = {0};
 
 /* USER CODE END PV */
 
@@ -99,6 +121,8 @@ int main(void)
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
 
+  (void)HAL_UART_Receive_IT(&huart2, uart_rx_data, sizeof(uart_rx_data) - 1U);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -108,6 +132,48 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    uint32_t now = HAL_GetTick();
+
+    if ((now - uart_last_tick) >= UART_TEST_INTERVAL_MS)
+    {
+      uart_last_tick = now;
+
+      HAL_UART_Transmit(&huart2, (uint8_t *)uart_tx_data, sizeof(uart_tx_data) - 1U, 20U);
+
+      if (huart2.RxState == HAL_UART_STATE_READY)
+      {
+        (void)HAL_UART_Receive_IT(&huart2, uart_rx_data, sizeof(uart_rx_data) - 1U);
+      }
+    }
+
+    if ((now - spi_last_tick) >= SPI_TEST_INTERVAL_MS)
+    {
+      spi_last_tick = now;
+
+      if (HAL_SPI_GetState(&hspi2) == HAL_SPI_STATE_READY)
+      {
+        (void)HAL_SPI_TransmitReceive_IT(&hspi2,
+                                         (uint8_t *)spi_tx_data,
+                                         spi_rx_data,
+                                         sizeof(spi_tx_data) - 1U);
+      }
+    }
+
+    if ((now - i2c_last_tick) >= I2C_TEST_INTERVAL_MS)
+    {
+      i2c_last_tick = now;
+
+      (void)HAL_I2C_Master_Transmit(&hi2c1,
+                                    I2C_TARGET_ADDR,
+                                    (uint8_t *)i2c_tx_data,
+                                    sizeof(i2c_tx_data) - 1U,
+                                    20U);
+
+      if (HAL_I2C_GetState(&hi2c1) == HAL_I2C_STATE_READY)
+      {
+        (void)HAL_I2C_Master_Receive_IT(&hi2c1, I2C_TARGET_ADDR, i2c_rx_data, sizeof(i2c_rx_data));
+      }
+    }
   }
   /* USER CODE END 3 */
 }
@@ -306,6 +372,31 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart->Instance == USART2)
+  {
+    uart_rx_done = 1U;
+    (void)HAL_UART_Receive_IT(&huart2, uart_rx_data, sizeof(uart_rx_data) - 1U);
+  }
+}
+
+void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+  if (hspi->Instance == SPI2)
+  {
+    spi_rx_done = 1U;
+  }
+}
+
+void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+  if (hi2c->Instance == I2C1)
+  {
+    i2c_rx_done = 1U;
+  }
+}
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if (GPIO_Pin == B1_Pin)
