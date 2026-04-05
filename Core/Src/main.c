@@ -22,6 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include <string.h>
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -99,6 +101,9 @@ int main(void)
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
 
+  const char *boot_msg = "UART2 ready\r\n";
+  HAL_UART_Transmit(&huart2, (uint8_t *)boot_msg, strlen(boot_msg), HAL_MAX_DELAY);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -108,6 +113,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    const char *loop_msg = "Hello from STM32 UART2\r\n";
+    HAL_UART_Transmit(&huart2, (uint8_t *)loop_msg, strlen(loop_msg), HAL_MAX_DELAY);
+    HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
