@@ -130,7 +130,7 @@ int main(void)
     uint8_t i2c_data[] = "Hello from STM32 I2C1\r\n";
     HAL_I2C_Master_Transmit(&hi2c1, I2C_DEV_ADDR, i2c_data, sizeof(i2c_data) - 1, HAL_MAX_DELAY);
 
-    HAL_Delay(1000);
+    HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
