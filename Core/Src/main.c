@@ -34,6 +34,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
+#define I2C_DEV_ADDR  (0x50 << 1)  /* 7-bit address 0x50, shifted for HAL */
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -104,6 +106,12 @@ int main(void)
   const char *boot_msg = "UART1 capyReady\r\n";
   HAL_UART_Transmit(&huart1, (uint8_t *)boot_msg, strlen(boot_msg), HAL_MAX_DELAY);
 
+  uint8_t spi_boot[] = "SPI2 capyReady\r\n";
+  HAL_SPI_Transmit(&hspi2, spi_boot, sizeof(spi_boot) - 1, HAL_MAX_DELAY);
+
+  uint8_t i2c_boot[] = "I2C1 capyReady\r\n";
+  HAL_I2C_Master_Transmit(&hi2c1, I2C_DEV_ADDR, i2c_boot, sizeof(i2c_boot) - 1, HAL_MAX_DELAY);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -115,6 +123,13 @@ int main(void)
     /* USER CODE BEGIN 3 */
     const char *loop_msg = "Hello from STM32 UART2\r\n";
     HAL_UART_Transmit(&huart2, (uint8_t *)loop_msg, strlen(loop_msg), HAL_MAX_DELAY);
+
+    uint8_t spi_data[] = "Hello from STM32 SPI2\r\n";
+    HAL_SPI_Transmit(&hspi2, spi_data, sizeof(spi_data) - 1, HAL_MAX_DELAY);
+
+    uint8_t i2c_data[] = "Hello from STM32 I2C1\r\n";
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_DEV_ADDR, i2c_data, sizeof(i2c_data) - 1, HAL_MAX_DELAY);
+
     HAL_Delay(1000);
   }
   /* USER CODE END 3 */
