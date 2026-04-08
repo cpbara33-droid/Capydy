@@ -110,7 +110,7 @@ int main(void)
   HAL_SPI_Transmit(&hspi2, spi_boot, sizeof(spi_boot) - 1, HAL_MAX_DELAY);
 
   uint8_t i2c_boot[] = "I2C1 capyReady\r\n";
-  HAL_I2C_Master_Transmit(&hi2c1, I2C_DEV_ADDR, i2c_boot, sizeof(i2c_boot) - 1, HAL_MAX_DELAY);
+  HAL_I2C_Master_Transmit(&hi2c1, I2C_DEV_ADDR, i2c_boot, sizeof(i2c_boot) - 1, 20);
 
   /* USER CODE END 2 */
 
@@ -128,7 +128,7 @@ int main(void)
     HAL_SPI_Transmit(&hspi2, spi_data, sizeof(spi_data) - 1, HAL_MAX_DELAY);
 
     uint8_t i2c_data[] = "Hello from STM32 I2C1\r\n";
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_DEV_ADDR, i2c_data, sizeof(i2c_data) - 1, HAL_MAX_DELAY);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_DEV_ADDR, i2c_data, sizeof(i2c_data) - 1, 20);
 
     HAL_Delay(100);
   }
