@@ -121,8 +121,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    const char *loop_msg = "Hello from STM32 UART2\r\n";
-    HAL_UART_Transmit(&huart2, (uint8_t *)loop_msg, strlen(loop_msg), HAL_MAX_DELAY);
+    const char *loop_msg = "Hello from STM32 UART1\r\n";
+    HAL_UART_Transmit(&huart1, (uint8_t *)loop_msg, strlen(loop_msg), HAL_MAX_DELAY);
 
     uint8_t spi_data[] = "Hello from STM32 SPI2\r\n";
     HAL_SPI_Transmit(&hspi2, spi_data, sizeof(spi_data) - 1, HAL_MAX_DELAY);
